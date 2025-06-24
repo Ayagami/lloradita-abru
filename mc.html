@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos de Mínimos Cuadrados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script> <!-- Para operaciones matriciales en JS -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!--
+    Objective: This document explains different Least Squares methods (Direct Solve, Generalized, Weighted Generalized), provides Python code examples, and displays a comparative interactive chart.
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    CONFIRMATION: Neither Mermaid JS nor SVG were used. All visuals are rendered using Chart.js on Canvas.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Wider for comparison chart */
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 500px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Métodos de Mínimos Cuadrados</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Me mato 100%</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Introducción a Mínimos Cuadrados -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">¿Qué son los Mínimos Cuadrados?</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Los Mínimos Cuadrados es una técnica de optimización matemática que encuentra la mejor línea de ajuste para un conjunto de puntos de datos. Lo logra minimizando la suma de los cuadrados de las diferencias (residuos) entre los valores observados y los valores predichos por el modelo. Es la base de muchas formas de regresión lineal.</p>
+            </div>
+
+            <!-- Métodos de Mínimos Cuadrados -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Explorando los Métodos de Ajuste</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Solve Directo -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">1. Mínimos Cuadrados: Solve Directo (`np.linalg.solve`)</h3>
+                        <p class="text-gray-400 mb-4">
+                            Este método es una forma directa de resolver el sistema de ecuaciones normales de los mínimos cuadrados cuando la matriz del sistema (A<sup>T</sup>A) es invertible. Es computacionalmente eficiente para sistemas bien condicionados.
+                            Se utiliza `np.linalg.solve` que es una implementación optimizada para resolver sistemas de ecuaciones lineales.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+# Datos
+t = np.array([0, 1, 2, 3])
+N = np.array([2960, 4540, 8080, 17060])
+ln_N = np.log(N)
+unos = np.ones_like(t)
+
+# Matriz A
+A_T = np.array([t, unos])
+A = A_T.T
+
+# --- Solve directo ---
+coef_solve = np.linalg.solve(A_T @ A, A_T @ ln_N)
+f1 = lambda t: np.exp(coef_solve[0] * t + coef_solve[1])
+ecm1 = ecm(t, N, f1) # Utilizando la función ecm
+print(f"ECM (Solve directo): {ecm1:.2f}")
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Generalizado sin pesos -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">2. Mínimos Cuadrados Generalizado (sin pesos)</h3>
+                        <p class="text-gray-400 mb-4">
+                            Esta es la formulación más general de los mínimos cuadrados ordinarios (OLS). Implica calcular explícitamente la inversa de (A<sup>T</sup>A). Aunque es matemáticamente equivalente al `solve` directo, puede ser menos estable numéricamente para matrices grandes o mal condicionadas.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+# --- Generalizado sin pesos ---
+AtA_inv = np.linalg.inv(A.T @ A)
+coef_gen = AtA_inv @ A.T @ ln_N
+f2 = lambda t: np.exp(coef_gen[0] * t + coef_gen[1])
+ecm2 = ecm(t, N, f2) # Utilizando la función ecm
+print(f"ECM (Generalizado): {ecm2:.2f}")
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Generalizado Ponderado -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 lg:col-span-2">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">3. Mínimos Cuadrados Generalizado Ponderado</h3>
+                        <p class="text-gray-400 mb-4">
+                            En el método ponderado, se asignan pesos (`w`) a cada observación, generalmente inversamente proporcionales a la varianza del error de esa observación. Esto es útil cuando algunas mediciones son más fiables que otras.
+                            La matriz `W` es una matriz diagonal con los pesos. Los errores grandes reciben menos peso, y los pequeños, más.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+# --- Generalizado ponderado ---
+w = 1 / N # Ejemplo de pesos: inversamente proporcional a N
+W = np.diag(w) # Matriz de pesos diagonal
+At_W = A.T @ W
+coef_pond = np.linalg.inv(At_W @ A) @ (At_W @ ln_N)
+f3 = lambda t: np.exp(coef_pond[0] * t + coef_pond[1])
+ecm3 = ecm(t, N, f3) # Utilizando la función ecm
+print(f"ECM (Generalizado ponderado): {ecm3:.2f}")
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico Comparativo -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Comparación Visual de los Ajustes</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Este gráfico muestra cómo cada método de mínimos cuadrados ajusta el modelo exponencial a los datos de población.</p>
+                <div class="chart-container w-full h-96">
+                    <canvas id="comparativeChart"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-400 mt-2">Observa las ligeras diferencias en las curvas de ajuste, especialmente cómo el método ponderado puede reaccionar a la magnitud de los datos.</p>
+            </div>
+
+            <!-- Función ECM -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Función de Error Cuadrático Medio (ECM)</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Esta es la función `ecm` utilizada en los ejemplos anteriores para calcular el Error Cuadrático Medio.</p>
+                <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+def ecm(x, y, f):
+    # Calcular los valores predichos por el modelo
+    y_predicho = f(x)
+    
+    # Calcular la diferencia entre valores reales y predichos (el error)
+    errores = y - y_predicho
+    
+    # Elevar los errores al cuadrado
+    errores_cuadrado = errores**2
+    
+    # Sumar todos los errores cuadrados
+    suma_errores_cuadrado = sum(errores_cuadrado)
+    
+    # Dividir por el número de observaciones para obtener el promedio
+    e = suma_errores_cuadrado / len(x)
+    
+    print('El error cuadrático medio es:', e)
+    return e
+</code></pre>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru | MC</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        };
+
+        // ===============================================
+        // FUNCIÓN ECM EN JAVASCRIPT (para simulaciones)
+        // ===============================================
+        function ecm(x, y, f) {
+            const y_predicho = x.map(f); // Apply the model function to x to get predictions
+            
+            let suma_errores_cuadrado = 0;
+            for (let i = 0; i < x.length; i++) {
+                const error = y[i] - y_predicho[i];
+                suma_errores_cuadrado += error * error;
+            }
+            
+            const e = suma_errores_cuadrado / x.length;
+            console.log('El error cuadrático medio es:', e); // For debugging in console
+            return e;
+        }
+
+        // ===============================================
+        // LÓGICA DE CÁLCULO DE MÍNIMOS CUADRADOS EN JAVASCRIPT
+        // Simulación de operaciones de NumPy
+        // ===============================================
+
+        // Datos
+        const t_data = [0, 1, 2, 3];
+        const N_data = [2960, 4540, 8080, 17060];
+        const ln_N_data = N_data.map(Math.log);
+        const unos_data = new Array(t_data.length).fill(1);
+
+        // Matriz A (en JS, representa A de la expresión Python A = A_T.T)
+        // A_T = np.array([t, unos])
+        // A = A_T.T
+        const A_matrix = t_data.map((val, i) => [val, unos_data[i]]); // [t_i, 1] for each row
+        const A_T_matrix = numeric.transpose(A_matrix);
+
+        // --- 1. Solve Directo ---
+        // coef_solve = np.linalg.solve(A_T @ A, A_T @ ln_N)
+        const ATA_solve = numeric.dot(A_T_matrix, A_matrix);
+        const AT_lnN_solve = numeric.dot(A_T_matrix, ln_N_data);
+        const coef_solve = numeric.solve(ATA_solve, AT_lnN_solve);
+        const f1 = (t) => Math.exp(coef_solve[0] * t + coef_solve[1]);
+        const ecm1 = ecm(t_data, N_data, f1); // Calculate ECM using the new function
+
+        // --- 2. Generalizado sin pesos ---
+        // AtA_inv = np.linalg.inv(A.T @ A)
+        // coef_gen = AtA_inv @ A.T @ ln_N
+        const AtA_inv_gen = numeric.inv(numeric.dot(A_T_matrix, A_matrix));
+        const coef_gen = numeric.dot(AtA_inv_gen, numeric.dot(A_T_matrix, ln_N_data));
+        const f2 = (t) => Math.exp(coef_gen[0] * t + coef_gen[1]);
+        const ecm2 = ecm(t_data, N_data, f2); // Calculate ECM using the new function
+
+        // --- 3. Generalizado ponderado ---
+        // w = 1 / N
+        // W = np.diag(w)
+        // At_W = A.T @ W
+        // coef_pond = np.linalg.inv(At_W @ A) @ (At_W @ ln_N)
+        const w_data = N_data.map(val => 1 / val);
+        const W_matrix = numeric.diag(w_data); // Create diagonal matrix from weights
+
+        const At_W_pond = numeric.dot(A_T_matrix, W_matrix);
+        const At_W_A_pond = numeric.dot(At_W_pond, A_matrix);
+        const At_W_lnN_pond = numeric.dot(At_W_pond, ln_N_data);
+        const coef_pond = numeric.dot(numeric.inv(At_W_A_pond), At_W_lnN_pond);
+        const f3 = (t) => Math.exp(coef_pond[0] * t + coef_pond[1]);
+        const ecm3 = ecm(t_data, N_data, f3); // Calculate ECM using the new function
+
+        // --- Generación de puntos para los gráficos ---
+        const t_graf = Array.from({length: 100}, (_, i) => 0 + i * (3 / 99));
+
+        const f1_graf = t_graf.map(f1);
+        const f2_graf = t_graf.map(f2);
+        const f3_graf = t_graf.map(f3);
+
+        // --- Renderizado del Gráfico Comparativo ---
+        new Chart(document.getElementById('comparativeChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos reales',
+                        data: t_data.map((t, i) => ({x: t, y: N_data[i]})),
+                        backgroundColor: '#00A1E4', // Color para los puntos de datos
+                        pointRadius: 8,
+                        borderColor: '#00A1E4',
+                        pointStyle: 'circle'
+                    },
+                    {
+                        label: 'Solve directo (ECM: ' + ecm1.toFixed(2) + ')', // Display ECM in legend
+                        data: t_graf.map((t, i) => ({x: t, y: f1_graf[i]})),
+                        type: 'line',
+                        borderColor: '#0077C0', // Azul medio
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.1,
+                        borderDash: [] // Línea sólida
+                    },
+                    {
+                        label: 'Generalizado (ECM: ' + ecm2.toFixed(2) + ')', // Display ECM in legend
+                        data: t_graf.map((t, i) => ({x: t, y: f2_graf[i]})),
+                        type: 'line',
+                        borderColor: '#005082', // Azul oscuro
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.1,
+                        borderDash: [5, 5] // Línea discontinua
+                    },
+                    {
+                        label: 'Generalizado ponderado (ECM: ' + ecm3.toFixed(2) + ')', // Display ECM in legend
+                        data: t_graf.map((t, i) => ({x: t, y: f3_graf[i]})),
+                        type: 'line',
+                        borderColor: '#60A5FA', // Un azul más claro para el ponderado
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.1,
+                        borderDash: [10, 5, 2, 5] // Línea de puntos y rayas
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions,
+                scales: {
+                    x: {
+                        ...commonChartOptions.scales.x,
+                        title: { display: true, text: 'Años desde 1981' }
+                    },
+                    y: {
+                        ...commonChartOptions.scales.y,
+                        title: { display: true, text: 'Población' }
+                    }
+                },
+                plugins: {
+                    ...commonChartOptions.plugins,
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
