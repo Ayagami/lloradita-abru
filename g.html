@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Datos con Matplotlib en Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script> <!-- OrbitControls for 3D interaction -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!--
+    Objective: This document explains basic 2D and 3D plotting with Matplotlib in Python, demonstrating key functions and providing interactive web visualizations.
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    CONFIRMATION: Neither Mermaid JS nor SVG were used. All visuals are rendered using Chart.js on Canvas or three.js for 3D.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Style for 3D canvas to fill container */
+        .chart-container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #232323; /* Dark background for 3D scene */
+            border-radius: 0.5rem; /* rounded-lg equivalent */
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Visualización de Datos (Graficos)</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Te juro que es facil</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Sección de Gráficos 2D Básicos -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Gráficos 2D Básicos con Matplotlib</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Matplotlib es una librería fundamental en Python para la creación de visualizaciones estáticas, animadas e interactivas. La mayoría de las funciones de trazado se encuentran en el módulo `pyplot`, que se importa comúnmente como `plt`.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Concepto: plt.plot() -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">`plt.plot()`: Trazando Datos</h3>
+                        <p class="text-gray-400 mb-4">Esta función es el corazón de la visualización 2D. Se usa para dibujar puntos y líneas en un gráfico. Puedes especificar los datos para los ejes X e Y, y también el estilo de los puntos o líneas.</p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+import matplotlib.pyplot as plt
+import numpy as np
+
+horas_ejercicio = np.array([2, 4, 6, 8, 10])
+porcentaje_grasa = np.array([20, 18, 15, 12, 10])
+
+# Un modelo de ajuste simple
+f2 = lambda x: -1.2 * x + 22
+
+# Datos como puntos 'o', con etiqueta 'Datos'
+plt.plot(horas_ejercicio, porcentaje_grasa, 'o', label='Datos')
+
+# Línea de ajuste, con etiqueta 'Ajuste f2'
+x_graf = np.linspace(min(horas_ejercicio), max(horas_ejercicio), 100)
+plt.plot(x_graf, f2(x_graf), label='Ajuste f2')
+
+# Más código para legend y show
+</code></pre>
+                        </div>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="chart2DPlot"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">Gráfico de dispersión con una línea de ajuste.</p>
+                    </div>
+
+                    <!-- Concepto: plt.legend() -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">`plt.legend()`: Identificando Series</h3>
+                        <p class="text-gray-400 mb-4">La función `legend()` es esencial para hacer que tus gráficos sean comprensibles. Muestra una caja con etiquetas para cada serie de datos trazada, usando el texto proporcionado en el argumento `label` de `plt.plot()`.</p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+# ... (código de plt.plot() de arriba) ...
+
+# Añade la leyenda al gráfico
+plt.legend()
+# Más código para show
+</code></pre>
+                        </div>
+                         <div class="chart-container w-full h-64">
+                            <canvas id="chart2DLegend"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">La leyenda facilita la identificación de los datos y el ajuste.</p>
+                    </div>
+
+                    <!-- Concepto: plt.show() -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 lg:col-span-2">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">`plt.show()`: Mostrando el Gráfico</h3>
+                        <p class="text-gray-400 mb-4">Después de definir todas las propiedades de tu gráfico (datos, estilos, etiquetas, leyendas), `plt.show()` es la función que lo renderiza y lo muestra en una ventana o en la salida de tu entorno de desarrollo (como Jupyter Notebook). Sin `show()`, el gráfico podría no aparecer.</p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+# ... (código de plt.plot() y plt.legend() de arriba) ...
+
+# Muestra el gráfico
+plt.show()
+</code></pre>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">El gráfico finalizado después de llamar a `plt.show()`.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Gráficos 3D -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Gráficos 3D con Matplotlib</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Matplotlib también permite crear visualizaciones en tres dimensiones, lo cual es útil para representar datos con múltiples variables o superficies.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Concepto: plt.figure() y fig.add_subplot(projection='3d') -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">`plt.figure()` y `fig.add_subplot()` para 3D</h3>
+                        <p class="text-gray-400 mb-4">
+                            `plt.figure()` crea una nueva figura o activa una existente, que es el contenedor donde se dibujarán los gráficos.
+                            `fig.add_subplot(projection='3d')` añade un conjunto de ejes 3D a la figura, preparándolo para el trazado tridimensional.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Datos de ejemplo para 3D
+X1 = np.linspace(-5, 5, 10)
+X2 = np.linspace(-5, 5, 10)
+X1, X2 = np.meshgrid(X1, X2)
+Z = np.sin(np.sqrt(X1**2 + X2**2)) # Superficie de ejemplo
+
+x1 = np.array([0, 1, 2, 3, 4])
+x2 = np.array([0, 1, 2, 3, 4])
+y = np.array([0.5, 1, 1.5, 2, 2.5]) # Puntos de ejemplo
+
+# Crea una figura con un tamaño específico
+fig = plt.figure(figsize=(10,7))
+# Añade un subplot 3D a la figura
+ax = fig.add_subplot(projection='3d')
+# Más código para trazar y etiquetar
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Concepto: ax.plot_surface() y ax.plot() -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">`ax.plot_surface()` y `ax.plot()` en 3D</h3>
+                        <p class="text-gray-400 mb-4">
+                            `ax.plot_surface(X, Y, Z)` traza una superficie 3D a partir de datos en forma de rejilla.
+                            `ax.plot(x, y, z, 'r*')` se utiliza para trazar puntos individuales (`'r*'`) o líneas en el espacio 3D.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+# ... (código de configuración de figura y ejes 3D) ...
+
+# Trazar la superficie 3D
+ax.plot_surface(X1, X2, Z, cmap='viridis', alpha=0.8)
+
+# Trazar puntos de datos individuales
+ax.plot(x1, x2, y, 'r*', markersize=8)
+
+# Más código para etiquetar y mostrar
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Concepto: ax.set_xlabel/ylabel/zlabel() -->
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 lg:col-span-2">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">`ax.set_xlabel/ylabel/zlabel()`: Etiquetas de Ejes 3D</h3>
+                        <p class="text-gray-400 mb-4">
+                            Estas funciones permiten establecer las etiquetas para cada uno de los tres ejes del gráfico 3D (`x`, `y`, `z`), lo cual es crucial para describir las dimensiones que se están visualizando.
+                        </p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto mb-4">
+<pre><code>
+# ... (código de trazado de superficie y puntos) ...
+
+# Establecer las etiquetas para los ejes
+ax.set_xlabel('Temperatura')
+ax.set_ylabel('Humedad')
+ax.set_zlabel('Recuento')
+
+# Finalmente, mostrar el gráfico
+plt.show()
+</code></pre>
+                        </div>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="chart3DPlot"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">Un ejemplo de gráfico 3D con superficie y puntos, con etiquetas de ejes.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru - plt</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Common Chart.js options for dark mode readability
+        const commonChartOptions2D = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#e2e8f0' // Light color for legend text
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0' // Light color for axis title
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)' // Lighter grid lines
+                    },
+                    ticks: {
+                        color: '#e2e8f0' // Light color for tick labels
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e2e8f0' // Light color for axis title
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)' // Lighter grid lines
+                    },
+                    ticks: {
+                        color: '#e2e8f0' // Light color for tick labels
+                    }
+                }
+            }
+        };
+
+        // --- 2D Plotting Simulation (Chart.js) ---
+        const horas_ejercicio_js = [2, 4, 6, 8, 10];
+        const porcentaje_grasa_js = [20, 18, 15, 12, 10];
+        const f2_js = (x) => -1.2 * x + 22;
+        const x_graf_js = Array.from({length: 100}, (_, i) => Math.min(...horas_ejercicio_js) + (Math.max(...horas_ejercicio_js) - Math.min(...horas_ejercicio_js)) * i / 99);
+        const y_graf_js = x_graf_js.map(f2_js);
+
+        new Chart(document.getElementById('chart2DPlot'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos',
+                        data: horas_ejercicio_js.map((h, i) => ({x: h, y: porcentaje_grasa_js[i]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 6,
+                        borderColor: '#00A1E4'
+                    },
+                    {
+                        label: 'Ajuste f2',
+                        data: x_graf_js.map((x, i) => ({x: x, y: y_graf_js[i]})),
+                        type: 'line',
+                        borderColor: '#0077C0',
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions2D,
+                scales: {
+                    x: { ...commonChartOptions2D.scales.x, title: { display: true, text: 'Horas de Ejercicio' } },
+                    y: { ...commonChartOptions2D.scales.y, title: { display: true, text: 'Porcentaje de Grasa' } }
+                }
+            }
+        });
+
+        // The legend chart is effectively the same as the plot chart, but explicitly highlights the legend.
+        new Chart(document.getElementById('chart2DLegend'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos',
+                        data: horas_ejercicio_js.map((h, i) => ({x: h, y: porcentaje_grasa_js[i]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 6,
+                        borderColor: '#00A1E4'
+                    },
+                    {
+                        label: 'Ajuste f2',
+                        data: x_graf_js.map((x, i) => ({x: x, y: y_graf_js[i]})),
+                        type: 'line',
+                        borderColor: '#0077C0',
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions2D,
+                scales: {
+                    x: { ...commonChartOptions2D.scales.x, title: { display: true, text: 'Horas de Ejercicio' } },
+                    y: { ...commonChartOptions2D.scales.y, title: { display: true, text: 'Porcentaje de Grasa' } }
+                }
+            }
+        });
+
+        // --- 3D Plotting Simulation (Three.js) ---
+        let scene, camera, renderer, controls;
+        let surfaceMesh, scatterPoints;
+
+        // Initialize Three.js scene
+        function init3D() {
+            const container = document.getElementById('chart3DPlot');
+            if (!container) return;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x232323); // Dark background for the scene
+
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(15, 15, 15);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // an animation loop is required when damping is enabled
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 10;
+            controls.maxDistance = 50;
+            controls.maxPolarAngle = Math.PI / 2;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 10).normalize();
+            scene.add(directionalLight);
+
+            // Axes Helper
+            const axesHelper = new THREE.AxesHelper(10);
+            scene.add(axesHelper);
+
+            // Generate 3D data (simulating numpy's meshgrid and sin function)
+            const X1_vals = Array.from({length: 20}, (_, i) => -5 + i * (10 / 19));
+            const X2_vals = Array.from({length: 20}, (_, i) => -5 + i * (10 / 19));
+            
+            // Create surface geometry
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            const colorScale = (val, minVal, maxVal) => {
+                const normalized = (val - minVal) / (maxVal - minVal);
+                // Interpolate between two blue shades
+                const color1 = new THREE.Color(0x00A1E4); // Light blue
+                const color2 = new THREE.Color(0x005082); // Dark blue
+                return color1.clone().lerp(color2, normalized);
+            };
+
+            let minZ = Infinity, maxZ = -Infinity;
+            const Z_data = [];
+            for (let i = 0; i < X1_vals.length; i++) {
+                for (let j = 0; j < X2_vals.length; j++) {
+                    const z = Math.sin(Math.sqrt(X1_vals[i]**2 + X2_vals[j]**2));
+                    Z_data.push(z);
+                    if (z < minZ) minZ = z;
+                    if (z > maxZ) maxZ = z;
+                }
+            }
+
+            for (let i = 0; i < X1_vals.length - 1; i++) {
+                for (let j = 0; j < X2_vals.length - 1; j++) {
+                    const idx1 = i * X2_vals.length + j;
+                    const idx2 = i * X2_vals.length + (j + 1);
+                    const idx3 = (i + 1) * X2_vals.length + j;
+                    const idx4 = (i + 1) * X2_vals.length + (j + 1);
+
+                    // Vertices for the two triangles forming a quad
+                    const v1 = new THREE.Vector3(X1_vals[i], X2_vals[j], Z_data[idx1]);
+                    const v2 = new THREE.Vector3(X1_vals[i], X2_vals[j+1], Z_data[idx2]);
+                    const v3 = new THREE.Vector3(X1_vals[i+1], X2_vals[j], Z_data[idx3]);
+                    const v4 = new THREE.Vector3(X1_vals[i+1], X2_vals[j+1], Z_data[idx4]);
+
+                    // Triangle 1 (v1, v2, v3)
+                    positions.push(v1.x, v1.y, v1.z); colors.push(colorScale(v1.z, minZ, maxZ).r, colorScale(v1.z, minZ, maxZ).g, colorScale(v1.z, minZ, maxZ).b);
+                    positions.push(v2.x, v2.y, v2.z); colors.push(colorScale(v2.z, minZ, maxZ).r, colorScale(v2.z, minZ, maxZ).g, colorScale(v2.z, minZ, maxZ).b);
+                    positions.push(v3.x, v3.y, v3.z); colors.push(colorScale(v3.z, minZ, maxZ).r, colorScale(v3.z, minZ, maxZ).g, colorScale(v3.z, minZ, maxZ).b);
+
+                    // Triangle 2 (v2, v4, v3)
+                    positions.push(v2.x, v2.y, v2.z); colors.push(colorScale(v2.z, minZ, maxZ).r, colorScale(v2.z, minZ, maxZ).g, colorScale(v2.z, minZ, maxZ).b);
+                    positions.push(v4.x, v4.y, v4.z); colors.push(colorScale(v4.z, minZ, maxZ).r, colorScale(v4.z, minZ, maxZ).g, colorScale(v4.z, minZ, maxZ).b);
+                    positions.push(v3.x, v3.y, v3.z); colors.push(colorScale(v3.z, minZ, maxZ).r, colorScale(v3.z, minZ, maxZ).g, colorScale(v3.z, minZ, maxZ).b);
+                }
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const material = new THREE.MeshPhongMaterial({
+                side: THREE.DoubleSide,
+                vertexColors: true, // Use vertex colors
+                shininess: 30
+            });
+            surfaceMesh = new THREE.Mesh(geometry, material);
+            scene.add(surfaceMesh);
+
+            // Scatter points (simulating ax.plot)
+            const x_scatter = [0, 1, 2, 3, 4];
+            const y_scatter = [0, 1, 2, 3, 4];
+            const z_scatter = [0.5, 1, 1.5, 2, 2.5];
+
+            const scatterGeometry = new THREE.BufferGeometry();
+            const scatterPositions = [];
+            for (let i = 0; i < x_scatter.length; i++) {
+                scatterPositions.push(x_scatter[i], y_scatter[i], z_scatter[i]);
+            }
+            scatterGeometry.setAttribute('position', new THREE.Float32BufferAttribute(scatterPositions, 3));
+
+            const scatterMaterial = new THREE.PointsMaterial({ color: 0xFF0000, size: 0.5 }); // Red stars
+            scatterPoints = new THREE.Points(scatterGeometry, scatterMaterial);
+            scene.add(scatterPoints);
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize3D, false);
+            onWindowResize3D(); // Initial resize call
+
+            animate3D(); // Start animation loop
+        }
+
+        function onWindowResize3D() {
+            const container = document.getElementById('chart3DPlot');
+            if (container) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            controls.update(); // only required if controls.enableDamping is set to true
+            renderer.render(scene, camera);
+        }
+
+        // Ensure init3D is called after the DOM is fully loaded
+        window.addEventListener('load', init3D);
+    </script>
+
+</body>
+</html>
