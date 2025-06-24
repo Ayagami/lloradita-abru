@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Cuadrático Medio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!--
+    Objective: This document explains the Mean Squared Error (MSE), its purpose, provides a Python code example, explains the function, and includes an interactive visualization.
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    CONFIRMATION: Neither Mermaid JS nor SVG were used. All visuals are rendered using Chart.js on Canvas.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Error Cuadrático Medio (ECM)</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Para algo tiene que servir estudiar ingenieria no?</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Sección: ¿Qué es el ECM? -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">¿Qué es el Error Cuadrático Medio (ECM)?</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">El Error Cuadrático Medio (ECM o MSE por sus siglas en inglés, Mean Squared Error) es una de las métricas más comunes para evaluar la precisión de un modelo de regresión. Mide la diferencia promedio entre los valores predichos por el modelo y los valores reales observados. La palabra "cuadrático" se refiere a que las diferencias se elevan al cuadrado antes de promediarlas, lo que penaliza más los errores grandes.</p>
+
+                <h3 class="text-xl font-bold text-[#00A1E4] mb-2">¿Cómo se calcula?</h3>
+                <p class="text-gray-400 mb-4">El ECM se calcula como el promedio de los cuadrados de los errores. Un "error" es la diferencia entre el valor real ($\mathbf{y}$) y el valor predicho por el modelo ($\mathbf{f(x)}$ o $\mathbf{\hat{y}}$).</p>
+                <div class="bg-[#1a202c] rounded-lg p-4 mb-4">
+                    <p class="text-center text-white text-lg font-mono">
+                        ECM = (1 / n) * Σ (yᵢ - ẏᵢ)²
+                    </p>
+                </div>
+                <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                    <li>yᵢ: Valor real observado para la i-ésima observación.</li>
+                    <li>ẏᵢ: Valor predicho por el modelo para la i-ésima observación.</li>
+                    <li>n: Número total de observaciones.</li>
+                </ul>
+            </div>
+
+            <!-- Sección: ¿Para qué se usa? -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#0077C0] mb-4">¿Para qué se usa el ECM?</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Evaluación de Modelos</h3>
+                        <p class="text-gray-400 mb-4">Es la métrica más directa para cuantificar el "error" de un modelo de regresión. Un ECM más bajo indica un mejor ajuste del modelo a los datos.</p>
+                        <ul class="list-disc list-inside text-gray-400 space-y-2">
+                            <li><strong>Comparación de Modelos:</strong> Permite comparar diferentes modelos para un mismo problema. El modelo con el ECM más bajo es, en principio, el más preciso.</li>
+                            <li><strong>Optimización:</strong> Muchos algoritmos de Machine Learning (ej. regresión lineal) utilizan el ECM como función de costo a minimizar durante el entrenamiento.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Propiedades Clave</h3>
+                        <ul class="list-disc list-inside text-gray-400 space-y-2">
+                            <li><strong>Siempre no negativo:</strong> Al elevar los errores al cuadrado, el ECM siempre es mayor o igual a cero. Un ECM de 0 indica un ajuste perfecto.</li>
+                            <li><strong>Sensibilidad a Outliers:</strong> Debido al término al cuadrado, el ECM penaliza fuertemente los errores grandes (valores atípicos o outliers), lo que puede hacerlo sensible a su presencia.</li>
+                            <li><strong>Unidades Cuadradas:</strong> La unidad del ECM es la unidad de la variable dependiente al cuadrado (ej. si 'y' es en dólares, el ECM estará en dólares cuadrados). Esto a veces dificulta su interpretación directa, por lo que a menudo se usa la Raíz del Error Cuadrático Medio (RECM o RMSE).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Ejemplo de Código Python y Función -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Ejemplo de Código Python y la Función ECM</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Aquí, la implementación en Python de la función ECM y un ejemplo práctico de su uso para evaluar un modelo simple.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Función `ecm(x, y, f)`</h3>
+                        <p class="text-gray-400 mb-4">Esta función calcula el Error Cuadrático Medio dada una función de modelo `f` y los datos reales y observados.</p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+def ecm(x, y, f):
+    # Calcular los valores predichos por el modelo
+    y_predicho = f(x)
+    
+    # Calcular la diferencia entre valores reales y predichos (el error)
+    errores = y - y_predicho
+    
+    # Elevar los errores al cuadrado
+    errores_cuadrado = errores**2
+    
+    # Sumar todos los errores cuadrados
+    suma_errores_cuadrado = sum(errores_cuadrado)
+    
+    # Dividir por el número de observaciones para obtener el promedio
+    e = suma_errores_cuadrado / len(x)
+    
+    print('El error cuadrático medio es:', e)
+    return e
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Ejemplo Práctico en Python</h3>
+                        <p class="text-gray-400 mb-4">Usemos la función `ecm` con un conjunto de datos y un modelo lineal simple.</p>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+import numpy as np
+
+# Datos de ejemplo (temperatura y ventas de helado)
+temperatura = np.array([20, 22, 25, 28, 30])
+ventas_reales = np.array([100, 110, 125, 130, 140])
+
+# Modelo lineal simple: ventas = 3 * temperatura + 40
+modelo_simple = lambda temp: 3 * temp + 40
+
+# Calcular el ECM usando nuestra función
+ecm_resultado = ecm(temperatura, ventas_reales, modelo_simple)
+
+print(f"ECM calculado: {ecm_resultado:.2f}")
+
+# Esto mostrará un valor que representa el error promedio al cuadrado
+# de las predicciones de nuestro modelo respecto a las ventas reales.
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-[#1a202c] rounded-lg shadow-md p-4">
+                         <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Visualización del Error Cuadrático</h3>
+                        <p class="text-center text-sm text-gray-400 mt-2">Los segmentos verticales muestran los errores (diferencia entre el valor real y predicho), y sus cuadrados.</p>
+                        <div class="chart-container w-full h-64 mt-4">
+                            <canvas id="ecmVisualizationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        };
+
+        // --- ECM Visualization Chart ---
+        const temperatura = [20, 22, 25, 28, 30];
+        const ventas_reales = [100, 110, 125, 130, 140];
+        const modelo_simple = (temp) => 3 * temp + 40;
+        const ventas_predichas = temperatura.map(modelo_simple);
+
+        const errors = ventas_reales.map((real, i) => real - ventas_predichas[i]);
+        const squaredErrors = errors.map(e => e * e);
+        const meanSquaredError = squaredErrors.reduce((sum, val) => sum + val, 0) / temperatura.length;
+
+        const errorLines = [];
+        const squaredErrorVizPoints = []; // For visualizing squares
+
+        for(let i = 0; i < temperatura.length; i++) {
+            errorLines.push({
+                x: temperatura[i],
+                y: ventas_reales[i],
+                x2: temperatura[i],
+                y2: ventas_predichas[i]
+            });
+            // Represent the "square" by plotting a point at predicted y + error * (error_sign) * some_factor
+            // For visual clarity, let's just show the error lines, and describe squaring.
+            // If we were to draw squares, it would make the chart very busy.
+            // Let's just plot the errors as points on a separate hidden y-axis conceptually, or just highlight lines.
+        }
+
+        new Chart(document.getElementById('ecmVisualizationChart'), {
+            type: 'scatter',
+            data: {
+                labels: temperatura.map(t => `Temp: ${t}°C`),
+                datasets: [
+                    {
+                        label: 'Ventas Reales',
+                        data: temperatura.map((t, i) => ({x: t, y: ventas_reales[i]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 6,
+                        borderColor: '#00A1E4',
+                    },
+                    {
+                        label: 'Ventas Predichas',
+                        data: temperatura.map((t, i) => ({x: t, y: ventas_predichas[i]})),
+                        backgroundColor: '#0077C0',
+                        pointRadius: 6,
+                        borderColor: '#0077C0',
+                        type: 'line', // Draw as a line
+                        showLine: true,
+                        fill: false,
+                        tension: 0,
+                        pointStyle: 'crossRot' // Show as crosses for clarity
+                    },
+                    {
+                        label: 'Errores',
+                        data: errorLines.flatMap(line => ([{x: line.x, y: line.y}, {x: line.x, y: line.y2}])), // FlatMap to create pairs of points for lines
+                        borderColor: '#FF0000', // Red for errors
+                        borderWidth: 2,
+                        type: 'line',
+                        showLine: true,
+                        fill: false,
+                        pointRadius: 0,
+                        spanGaps: false, // Prevents line connecting across separate data points
+                        borderDash: [5, 5] // Dashed lines for errors
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions,
+                plugins: {
+                    ...commonChartOptions.plugins,
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#e2e8f0',
+                            filter: function (legendItem, chartData) {
+                                // Hide the 'Errores' legend item because it's drawn with multiple segments
+                                return legendItem.text !== 'Errores';
+                            }
+                        }
+                    },
+                    annotation: { // Add annotation plugin for lines
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                scaleID: 'y',
+                                value: meanSquaredError,
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 2,
+                                label: {
+                                    display: true,
+                                    content: 'ECM promedio: ' + meanSquaredError.toFixed(2),
+                                    position: 'end'
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Temperatura (°C)' } },
+                    y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Ventas' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
