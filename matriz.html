@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Covarianzas, Autovalores y Autovectores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!--
+    Objective: This document explains Covariance Matrix, Eigenvalues, and Eigenvectors, their purpose, usage, and provides Python code examples.
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    CONFIRMATION: No interactive charts are requested or used directly for these concepts, focusing on text and code examples.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Matriz de Covarianzas, Autovalores y Autovectores</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Entendamos para que es esto</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Sección: Matriz de Covarianzas -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Matriz de Covarianzas</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">
+                    La matriz de covarianzas es una matriz cuadrada simétrica que describe la covarianza entre cada par de variables en un conjunto de datos multivariado. Es una herramienta clave para entender cómo las diferentes variables se relacionan entre sí.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">¿Qué es y Para qué se usa?</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Elementos diagonales:</strong> Las entradas en la diagonal principal son las varianzas de cada variable individual.</li>
+                            <li><strong>Elementos fuera de la diagonal:</strong> Las entradas fuera de la diagonal son las covarianzas entre pares de variables.
+                                <ul>
+                                    <li>Covarianza positiva: Las variables tienden a aumentar o disminuir juntas.</li>
+                                    <li>Covarianza negativa: Una variable tiende a aumentar mientras la otra disminuye.</li>
+                                    <li>Covarianza cercana a cero: Las variables no tienen una relación lineal fuerte.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Análisis de relaciones:</strong> Permite entender la dirección y fuerza de la relación lineal entre variables.</li>
+                            <li><strong>Reducción de dimensionalidad (PCA):</strong> Es el primer paso en el Análisis de Componentes Principales (PCA), donde se busca transformar los datos a un nuevo sistema de coordenadas donde las variables no estén correlacionadas.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Regla Nemotécnica para Covarianza</h3>
+                        <p class="text-gray-400 mb-4">
+                            Piensa en la **Co**-varianza como la "co-relación" o "cómo se mueven **co**njuntamente" dos variables. Si una sube y la otra sube, es positiva. Si una sube y la otra baja, es negativa. Si no se afectan, es cero.
+                        </p>
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Ejemplo de Código Python (`np.cov`)</h3>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+import numpy as np
+
+# Datos de ejemplo (filas son observaciones, columnas son variables)
+# Variable 1: Horas de estudio
+# Variable 2: Calificación obtenida
+data = np.array([
+    [2, 60],
+    [4, 75],
+    [6, 85],
+    [8, 90],
+    [10, 95]
+])
+
+# Para calcular la matriz de covarianzas, np.cov espera las variables como filas.
+# Si tus datos están como columnas, debes transponerlos.
+covariance_matrix = np.cov(data, rowvar=False) # rowvar=False indica que las variables son las columnas
+
+print("Matriz de Covarianzas:\n", covariance_matrix)
+
+# Interpretación:
+# cov[0,0]: Varianza de la Variable 1 (horas de estudio)
+# cov[1,1]: Varianza de la Variable 2 (calificación)
+# cov[0,1] / cov[1,0]: Covarianza entre horas de estudio y calificación (debería ser positiva)
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Autovalores y Autovectores -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#0077C0] mb-4">Autovalores y Autovectores</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">
+                    Los autovalores (eigenvalues) y autovectores (eigenvectors) son conceptos clave en álgebra lineal, especialmente importantes en el análisis de matrices y en la reducción de dimensionalidad como PCA.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">¿Qué son y Para qué se usan?</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Autovector:</strong> Es un vector no nulo que, cuando una transformación lineal (representada por una matriz) se le aplica, solo cambia su escala (se alarga o encoge), pero no su dirección.</li>
+                            <li><strong>Autovalor:</strong> Es el factor por el cual el autovector es escalado. Indica la magnitud de la "estirada" o "encogida" en la dirección del autovector.</li>
+                            <li><strong>Direcciones de Varianza (PCA):</strong> En PCA, los autovectores de la matriz de covarianzas son las "componentes principales", que representan las direcciones de máxima varianza en los datos.</li>
+                            <li><strong>Magnitud de Varianza (PCA):</strong> Los autovalores correspondientes indican la cantidad de varianza capturada a lo largo de cada componente principal. Un autovalor más grande significa que ese autovector (componente principal) explica más varianza de los datos.</li>
+                            <li><strong>Estabilidad y Dinámica:</strong> Se usan en sistemas dinámicos para entender la estabilidad de un sistema o cómo evoluciona con el tiempo.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Regla Nemotécnica para Autovalores/Autovectores</h3>
+                        <p class="text-gray-400 mb-4">
+                            Piensa en un autovector como un **"eje especial"** de la matriz. Cuando la matriz "actúa" sobre él (lo multiplica), el vector permanece en el mismo "camino", solo se hace más largo o más corto. El autovalor es el **"factor de estiramiento"** de ese eje.
+                        </p>
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Ejemplo de Código Python (`np.linalg.eig`, `np.linalg.eigh`)</h3>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+import numpy as np
+
+# Ejemplo de matriz cuadrada (podría ser una matriz de covarianzas)
+# Matriz simétrica
+matrix = np.array([
+    [4, 2],
+    [2, 5]
+])
+
+# Calcular autovalores y autovectores para una matriz simétrica
+# (eigh es más eficiente y numéricamente estable para matrices simétricas)
+eigenvalues_sym, eigenvectors_sym = np.linalg.eigh(matrix)
+
+print("Matriz original (simétrica):\n", matrix)
+print("\nAutovalores (matriz simétrica):\n", eigenvalues_sym)
+print("\nAutovectores (matriz simétrica):\n", eigenvectors_sym) # Columnas son los autovectores
+
+# Ejemplo con una matriz no simétrica (usando eig)
+matrix_non_sym = np.array([
+    [1, 2],
+    [3, 4]
+])
+
+eigenvalues_non_sym, eigenvectors_non_sym = np.linalg.eig(matrix_non_sym)
+
+print("\nMatriz original (no simétrica):\n", matrix_non_sym)
+print("\nAutovalores (matriz no simétrica):\n", eigenvalues_non_sym)
+print("\nAutovectores (matriz no simétrica):\n", eigenvectors_non_sym) # Columnas son los autovectores
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Relación entre conceptos (PCA) -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6 text-center">
+                <h2 class="text-2xl font-bold text-[#00A1E4] mb-4">La Conexión: PCA</h2>
+                <p class="text-[#e2e8f0] mb-4">
+                    Estos tres conceptos (Matriz de Covarianzas, Autovalores y Autovectores) son el corazón del **Análisis de Componentes Principales (PCA)**.
+                </p>
+                <p class="text-gray-400 mb-4">
+                    PCA utiliza la <strong>matriz de covarianzas</strong> para encontrar las direcciones (<strong>autovectores</strong>) a lo largo de las cuales los datos varían más, y la magnitud de esa varianza (<strong>autovalores</strong>). Esto permite reducir la dimensionalidad de un conjunto de datos manteniendo la mayor cantidad de información posible.
+                </p>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
