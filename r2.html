@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coeficiente R Cuadrado (R²)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- 
+    Plan de la Infografía:
+    1.  Introducción: Definir qué es R² con un titular impactante.
+    2.  Escala Visual: Mostrar con gráficos de dispersión cómo se ven los valores de R² (bajo, medio, alto).
+    3.  Métrica Clave: Usar un "gran número" y un gráfico de dona para resaltar un ejemplo (ej. 83.5%).
+    4.  Desglose de la Fórmula: Explicar visualmente R² = SSR / SST usando un diagrama de flujo hecho con HTML/CSS.
+    5.  Componentes Detallados: Explicar SST, SSR y SSE con tarjetas informativas y un gráfico de dona que muestre su relación.
+    6.  Ejemplos de Código en Acción: Presentar casos prácticos de cálculo de R² con código Python y sus gráficos.
+    7.  Código de la Función R2: Mostrar la función de Python que calcula R².
+    8.  Conclusión: Resumen de los puntos clave.
+
+    Selección de Visualizaciones:
+    -   R² como "Gran Número": (Meta: Informar) - Texto grande y audaz para impacto.
+    -   Gráficos de Dispersión (3): (Meta: Relaciones) - Mostrar la correlación y el ajuste del modelo. Implementado con Chart.js (Canvas).
+    -   Gráfico de Dona (2): (Meta: Informar/Comparar) - Mostrar proporciones (porcentaje explicado, composición de la varianza). Implementado con Chart.js (Canvas).
+    -   Diagrama de Flujo: (Meta: Organizar) - Mostrar el proceso de cálculo de la fórmula. Implementado con HTML/CSS (divs, flexbox, bordes).
+    -   Bloques de Código: (Meta: Informar) - Presentar el código Python de forma clara. Implementado con etiquetas <pre> y <code>.
+    -   Gráficos de Ajuste (2): (Meta: Relaciones) - Visualizar los ajustes lineal y polinomial sobre los datos. Implementado con Chart.js (Canvas).
+    -   CONFIRMATION: Neither Mermaid JS nor SVG were used. All visuals are rendered using Chart.js on Canvas or structured HTML/CSS with Tailwind.
+
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">R Cuadrado (R²)</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Si con esto no se entiende, me mato.</p>
+        </header>
+
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <div class="md:col-span-3 lg:col-span-3 bg-[#2d3748] rounded-lg shadow-md p-6 mb-6 text-center">
+                 <h2 class="text-2xl font-bold text-[#00A1E4] mb-4">¿Qué significa el valor de R²?</h2>
+                 <p class="text-[#e2e8f0] mb-6">R² mide la proporción de la variabilidad en los datos que es explicada por el modelo. Va de 0% (el modelo no explica nada) a 100% (el modelo explica todo perfectamente).</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="flex flex-col items-center">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">R² ≈ 0% (Ajuste Débil)</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="scatterLow"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">Los puntos están muy dispersos. El modelo (línea) no logra capturar la tendencia de los datos.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">R² ≈ 50% (Ajuste Moderado)</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="scatterMid"></canvas>
+                        </div>
+                         <p class="text-sm text-gray-400 mt-2">Hay una tendencia visible, pero con una variabilidad considerable alrededor de la línea del modelo.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">R² ≈ 100% (Ajuste Fuerte)</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="scatterHigh"></canvas>
+                        </div>
+                         <p class="text-sm text-gray-400 mt-2">Los puntos están muy cerca de la línea del modelo. El modelo explica casi toda la variabilidad.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-1 md:col-span-1 bg-[#2d3748] rounded-lg shadow-md p-8 flex flex-col justify-center items-center">
+                <h2 class="text-2xl font-bold text-[#00A1E4] text-center mb-4">Un Ejemplo Práctico</h2>
+                <p class="text-center text-[#e2e8f0] mb-4">Un R² de 0.835 significa que el modelo...</p>
+                <div class="text-7xl font-black text-[#00A1E4]">83.5%</div>
+                <p class="text-center font-bold text-lg text-[#0077C0] mt-2">...explica la variabilidad de los datos.</p>
+            </div>
+
+            <div class="lg:col-span-1 md:col-span-1 bg-[#2d3748] rounded-lg shadow-md p-6 flex flex-col justify-center items-center">
+                 <div class="chart-container w-full h-64">
+                    <canvas id="donutExample"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-400 mt-4">Visualización de la proporción de varianza explicada vs. no explicada por el modelo.</p>
+            </div>
+
+            <div class="lg:col-span-1 md:col-span-2 bg-[#005082] text-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-center mb-6">Descomponiendo la Fórmula</h2>
+                <p class="text-center text-gray-200 mb-6">R² se calcula dividiendo la variación que el modelo explica entre la variación total de los datos.</p>
+                <div class="flex flex-col items-center space-y-4">
+                    <div class="bg-[#0077C0] p-4 rounded-lg w-full text-center">
+                        <p class="font-bold">Variación Explicada por el Modelo (SSR)</p>
+                        <p class="text-xs"><code>sum((ŷ - ȳ)²)</code></p>
+                    </div>
+                    <div class="text-4xl font-black">÷</div>
+                    <div class="bg-[#00A1E4] p-4 rounded-lg w-full text-center">
+                        <p class="font-bold">Variación Total en los Datos (SST)</p>
+                        <p class="text-xs"><code>sum((y - ȳ)²)</code></p>
+                    </div>
+                     <div class="text-4xl font-black">=</div>
+                     <div class="bg-[#e2e8f0] text-[#005082] p-4 rounded-lg w-full text-center">
+                        <p class="text-3xl font-black">R²</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 lg:col-span-3 bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Los Componentes Clave</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="border border-gray-700 rounded-lg p-4">
+                       <h3 class="font-bold text-lg text-[#00A1E4]">SST: Suma Total de Cuadrados</h3>
+                       <p class="text-sm text-[#e2e8f0]">La variabilidad total. Mide qué tan dispersos están los datos reales (y) respecto a su media (ȳ).</p>
+                    </div>
+                    <div class="border border-gray-700 rounded-lg p-4">
+                        <h3 class="font-bold text-lg text-[#0077C0]">SSR: Suma de Cuadrados de la Regresión</h3>
+                        <p class="text-sm text-[#e2e8f0]">La variabilidad explicada. Mide qué tan lejos están las predicciones del modelo (ŷ) de la media de los datos (ȳ).</p>
+                    </div>
+                    <div class="border border-gray-700 rounded-lg p-4">
+                       <h3 class="font-bold text-lg text-gray-400">SSE: Suma de Errores Cuadrados</h3>
+                       <p class="text-sm text-[#e2e8f0]">La variabilidad no explicada (error). Mide la diferencia entre los valores reales (y) y los predichos (ŷ).</p>
+                    </div>
+                </div>
+                <p class="text-center text-[#e2e8f0] mt-6 font-semibold">SST (Total) = SSR (Explicada) + SSE (No Explicada)</p>
+            </div>
+
+            <!-- Sección de Ejemplos de Código en Acción -->
+            <div class="md:col-span-2 lg:col-span-3 bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Ejemplos de Código en Acción</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Veamos cómo calcular R² en escenarios prácticos de ajuste de modelos.</p>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Ejemplo 1: Ajuste Lineal</h3>
+                    <p class="text-[#e2e8f0] mb-4">Aquí se evalúa un modelo lineal que busca la relación entre la distancia de planetas al sol y sus períodos orbitales, utilizando los datos proporcionados.</p>
+                    <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+# Importar la librería NumPy para operaciones con arrays
+import numpy as np
+
+# Datos proporcionados: distancias (d) y tiempos (t)
+d = np.array([0.387,0.723,1,1.524,5.2044,9.5826,19.2184,30.11])
+t = np.array([8.797,22.47,36.53,68.7,433.5,1076,3080,6022])*10
+
+# Construir la matriz A para el ajuste lineal (y = m*x + b)
+# A = [[1, x1], [1, x2], ..., [1, xn]]
+A_T = np.array([np.ones(len(d)), d])
+A = np.transpose(A_T)
+
+# Calcular los coeficientes (pendiente e intercepto) usando mínimos cuadrados
+# (A_T @ A) @ coef = A_T @ t
+coef = np.linalg.solve(A_T @ A, A_T @ t)
+
+# Definir la función del modelo lineal ajustado
+# f(x) = intercepto + pendiente * x
+f_lineal = lambda x: coef[0] + coef[1]*x
+
+# Calcular R² para el ajuste lineal
+r2_lineal = R2(d, t, f_lineal)
+print(f'R² (Ajuste Lineal): {r2_lineal:.4f}')
+</code></pre>
+                    </div>
+                    <div class="chart-container w-full h-64 mt-4">
+                        <canvas id="chartLinearFit"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-gray-400 mt-2">Gráfico de dispersión con el ajuste lineal de los datos.</p>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-[#0077C0] mb-2">Ejemplo 2: Ajuste Polinomial</h3>
+                    <p class="text-[#e2e8f0] mb-4">Evaluamos un modelo polinomial de grado 2 para ver si mejora la explicación de la variabilidad de los datos, comparado con el ajuste lineal.</p>
+                    <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+# Datos de ejemplo para ajuste polinomial
+x_poly = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+y_poly = np.array([2, 3, 4, 5, 7, 8, 10, 13, 16, 20]) + np.random.normal(0, 0.5, 10)
+
+# Realizar un ajuste polinomial de grado 2
+# coef_poly = [c0, c1, c2] donde y = c0 + c1*x + c2*x^2
+coef_poly = np.polyfit(x_poly, y_poly, 2)
+
+# Definir la función del modelo polinomial ajustado
+f_poly = lambda x: coef_poly[0]*x**2 + coef_poly[1]*x + coef_poly[2]
+
+# Calcular R² para el ajuste polinomial
+r2_poly = R2(x_poly, y_poly, f_poly)
+print(f'R² (Ajuste Polinomial): {r2_poly:.4f}')
+</code></pre>
+                    </div>
+                    <div class="chart-container w-full h-64 mt-4">
+                        <canvas id="chartPolynomialFit"></canvas>
+                    </div>
+                     <p class="text-center text-sm text-gray-400 mt-2">Gráfico de dispersión con el ajuste polinomial de los datos.</p>
+                </div>
+            </div>
+            <!-- Fin de la sección de Ejemplos de Código en Acción -->
+            
+            <div class="md:col-span-2 lg:col-span-3 bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Código de la Función R2</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Esta es la función de Python utilizada en los ejemplos anteriores para calcular R².</p>
+                <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+def R2(x, y, f):
+    # ŷ: Predicciones del modelo
+    y_estrella = f(x)
+
+    # ȳ: Media de los valores reales
+    y_barra = sum(y) / len(y)
+
+    # SSR: Variación explicada
+    num = sum((y_estrella - y_barra)**2)
+    
+    # SST: Variación total
+    den = sum((y - y_barra)**2)
+    
+    R = num / den
+    print('R2=',R) # Imprimir el valor de R2 cuando se llama a la función
+    return R
+</code></pre>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita Abru - R2.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+
+        const chartPlugins = {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    title: tooltipTitleCallback
+                }
+            }
+        };
+
+        const generateScatterData = (count, slope, intercept, noise) => {
+            const data = [];
+            for (let i = 0; i < count; i++) {
+                const x = Math.random() * 10;
+                const y = slope * x + intercept + (Math.random() - 0.5) * noise;
+                data.push({ x, y });
+            }
+            return data;
+        };
+        
+        const getRegressionLine = (data, slope, intercept) => {
+            const minX = Math.min(...data.map(p => p.x));
+            const maxX = Math.max(...data.map(p => p.x));
+            return [{x: minX, y: slope * minX + intercept}, {x: maxX, y: slope * maxX + intercept}];
+        }
+
+        const lowData = generateScatterData(50, 0.5, 2, 15);
+        const midData = generateScatterData(50, 1.5, 1, 8);
+        const highData = generateScatterData(50, 2, 0.5, 2);
+
+        // Common chart options for dark mode readability
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        color: '#e2e8f0' // Light color for legend text
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0' // Light color for axis title
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)' // Lighter grid lines
+                    },
+                    ticks: {
+                        color: '#e2e8f0' // Light color for tick labels
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e2e8f0' // Light color for axis title
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)' // Lighter grid lines
+                    },
+                    ticks: {
+                        color: '#e2e8f0' // Light color for tick labels
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('scatterLow'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Datos',
+                    data: lowData,
+                    backgroundColor: '#00A1E4'
+                }, {
+                    label: 'Línea de Regresión',
+                    data: getRegressionLine(lowData, 0.5, 2),
+                    type: 'line',
+                    borderColor: '#005082',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 0
+                }]
+            },
+            options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('scatterMid'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Datos',
+                    data: midData,
+                    backgroundColor: '#0077C0'
+                },{
+                    label: 'Línea de Regresión',
+                    data: getRegressionLine(midData, 1.5, 1),
+                    type: 'line',
+                    borderColor: '#005082',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 0
+                }]
+            },
+            options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('scatterHigh'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Datos',
+                    data: highData,
+                    backgroundColor: '#005082'
+                },{
+                    label: 'Línea de Regresión',
+                    data: getRegressionLine(highData, 2, 0.5),
+                    type: 'line',
+                    borderColor: '#0077C0',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 0
+                }]
+            },
+            options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('donutExample'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Varianza Explicada', 'Varianza No Explicada'],
+                datasets: [{
+                    data: [83.5, 16.5],
+                    backgroundColor: ['#00A1E4', '#0077C0'], /* Lighter accent for explained, darker for unexplained */
+                    borderColor: ['#00A1E4', '#0077C0'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0' // Light color for legend text
+                        }
+                    },
+                     tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // ===============================================
+        // JavaScript para los Ejemplos de Código en Acción
+        // ===============================================
+
+        // La función R2 (replicada en JS para uso en el cliente)
+        const R2 = (x_arr, y_arr, f_func) => {
+            const y_estrella = x_arr.map(x => f_func(x));
+            const y_barra = y_arr.reduce((a, b) => a + b, 0) / y_arr.length;
+            
+            const num = y_estrella.reduce((sum, val, i) => sum + (val - y_barra)**2, 0);
+            const den = y_arr.reduce((sum, val) => sum + (val - y_barra)**2, 0);
+            
+            if (den === 0) return 0; // Evitar división por cero si la varianza es cero
+            return num / den;
+        };
+
+        // --- Ejemplo 1: Ajuste Lineal ---
+        const d_js = [0.387, 0.723, 1, 1.524, 5.2044, 9.5826, 19.2184, 30.11];
+        const t_js = [8.797, 22.47, 36.53, 68.7, 433.5, 1076, 3080, 6022].map(val => val * 10); // Multiplicar por 10 como en el ejemplo Python
+
+        // Cálculo de coeficientes de regresión lineal simple en JS (y = mx + b)
+        let sum_x = 0, sum_y = 0, sum_xy = 0, sum_x2 = 0;
+        const N = d_js.length;
+
+        for (let i = 0; i < N; i++) {
+            sum_x += d_js[i];
+            sum_y += t_js[i];
+            sum_xy += d_js[i] * t_js[i];
+            sum_x2 += d_js[i] * d_js[i];
+        }
+
+        const m_linear = (N * sum_xy - sum_x * sum_y) / (N * sum_x2 - sum_x * sum_x);
+        const b_linear = (sum_y - m_linear * sum_x) / N;
+
+        const f_lineal_js = (x) => m_linear * x + b_linear;
+
+        const x_graf_linear = Array.from({length: 100}, (_, i) => Math.min(...d_js) + (Math.max(...d_js) - Math.min(...d_js)) * i / 99);
+        const y_graf_linear = x_graf_linear.map(f_lineal_js);
+
+        new Chart(document.getElementById('chartLinearFit'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos Originales',
+                        data: d_js.map((d_val, i) => ({x: d_val, y: t_js[i]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 5
+                    },
+                    {
+                        label: 'Ajuste Lineal',
+                        data: x_graf_linear.map((x_val, i) => ({x: x_val, y: y_graf_linear[i]})),
+                        type: 'line',
+                        borderColor: '#0077C0', /* Darker blue for contrast */
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#e2e8f0' /* Light color for legend text */
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Distancia (d)',
+                            color: '#e2e8f0' /* Light color for axis title */
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)' /* Lighter grid lines */
+                        },
+                        ticks: {
+                            color: '#e2e8f0' /* Light color for tick labels */
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo (t)',
+                            color: '#e2e8f0' /* Light color for axis title */
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)' /* Lighter grid lines */
+                        },
+                        ticks: {
+                            color: '#e2e8f0' /* Light color for tick labels */
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Ejemplo 2: Ajuste Polinomial ---
+        // Generación de datos que simulan una tendencia cuadrática
+        const x_poly_js = Array.from({length: 20}, (_, i) => i * 0.5 + 1); // 1 a 10
+        const y_poly_js = x_poly_js.map(x => 0.5 * x**2 + 2 * x + 5 + (Math.random() - 0.5) * 5); // Cuadrática con ruido
+
+        // Coeficientes pre-calculados o simulados para una curva polinomial de grado 2
+        // Estos serían el resultado de un np.polyfit(x_poly_js, y_poly_js, 2) aproximado
+        const coef_poly_js = [0.5, 2, 5]; // [c2, c1, c0] para y = c2*x^2 + c1*x + c0
+
+        const f_poly_js = (x) => coef_poly_js[0] * x**2 + coef_poly_js[1] * x + coef_poly_js[2];
+
+        const x_graf_poly = Array.from({length: 100}, (_, i) => Math.min(...x_poly_js) + (Math.max(...x_poly_js) - Math.min(...x_poly_js)) * i / 99);
+        const y_graf_poly = x_graf_poly.map(f_poly_js);
+
+        new Chart(document.getElementById('chartPolynomialFit'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos Originales',
+                        data: x_poly_js.map((x_val, i) => ({x: x_val, y: y_poly_js[i]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 5
+                    },
+                    {
+                        label: 'Ajuste Polinomial',
+                        data: x_graf_poly.map((x_val, i) => ({x: x_val, y: y_graf_poly[i]})),
+                        type: 'line',
+                        borderColor: '#0077C0', /* Darker blue for contrast */
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.4 // Para una curva más suave
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#e2e8f0' /* Light color for legend text */
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Variable X',
+                            color: '#e2e8f0' /* Light color for axis title */
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)' /* Lighter grid lines */
+                        },
+                        ticks: {
+                            color: '#e2e8f0' /* Light color for tick labels */
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Variable Y',
+                            color: '#e2e8f0' /* Light color for axis title */
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)' /* Lighter grid lines */
+                        },
+                        ticks: {
+                            color: '#e2e8f0' /* Light color for tick labels */
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>
