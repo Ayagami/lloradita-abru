@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentos de Scikit-learn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Fundamentos de Scikit-learn</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Herramientas para Reducción de Dimensionalidad y Clustering.</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Sección StandardScaler -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">StandardScaler: Estandarización de Datos</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">StandardScaler es una herramienta de preprocesamiento que escala los datos para que tengan una media de 0 y una desviación estándar de 1. Esto es crucial para muchos algoritmos de Machine Learning que son sensibles a la escala de las características (como SVM, K-Means, regresión logística).</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">¿Para qué se usa?</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Normalización:</strong> Transforma los datos para que sigan una distribución estándar.</li>
+                            <li><strong>Rendimiento de algoritmos:</strong> Mejora la convergencia y el rendimiento de modelos basados en distancia o gradiente.</li>
+                            <li><strong>Comparabilidad:</strong> Hace que las características sean comparables, eliminando el efecto de sus unidades de medida.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Ejemplo de Código Python</h3>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Datos de ejemplo
+data = np.array([[10], [20], [30], [5], [25]])
+
+# Crear y ajustar el escalador, luego transformar los datos
+scaler = StandardScaler()
+X_std = scaler.fit_transform(data)
+
+print("Datos originales:\n", data)
+print("Datos escalados (media 0, desvío 1):\n", X_std)
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 flex flex-col justify-center items-center">
+                        <h3 class="text-xl font-bold text-[#00A1E4] mb-2">Visualización: Antes y Después</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="standardScalerChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">Observa cómo los valores se centran alrededor de cero con una escala uniforme.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección PCA -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#0077C0] mb-4">PCA: Análisis de Componentes Principales</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">PCA es una técnica de reducción de dimensionalidad que transforma un conjunto de variables correlacionadas en un conjunto más pequeño de variables no correlacionadas llamadas "componentes principales", que capturan la mayor parte de la varianza original.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">¿Para qué se usa?</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Reducción de Dimensionalidad:</strong> Simplifica conjuntos de datos complejos, eliminando la redundancia.</li>
+                            <li><strong>Visualización:</strong> Permite visualizar datos de alta dimensión en 2D o 3D.</li>
+                            <li><strong>Eliminación de Ruido:</strong> Puede reducir el ruido al retener solo los componentes más significativos.</li>
+                            <li><strong>Rendimiento del Modelo:</strong> Acelera los algoritmos y reduce el riesgo de sobreajuste.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Ejemplo de Código Python</h3>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Datos de ejemplo (2 características)
+X = np.array([
+    [1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6],
+    [9, 11], [10, 8], [4, 5], [6, 9], [11, 12]
+])
+
+# Estandarizar los datos
+scaler = StandardScaler()
+X_std = scaler.fit_transform(X)
+
+# Realizar PCA
+pca = PCA(n_components=2) # Para visualizar en 2D
+Z = pca.fit_transform(X_std)
+
+print("Datos originales (primeras 5 filas):\n", X[:5])
+print("Datos estandarizados (primeras 5 filas):\\n", X_std[:5])
+print("Componentes principales (primeras 5 filas):\\n", Z[:5])
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 flex flex-col justify-center items-center">
+                         <h3 class="text-xl font-bold text-[#0077C0] mb-2">Visualización: Componentes Principales</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="pcaChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">Los datos proyectados en los nuevos ejes de máxima varianza.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección KMeans -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#005082] mb-4">KMeans: Clustering No Supervisado</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">K-Means es un algoritmo de clustering popular que agrupa puntos de datos en 'k' clústeres, donde cada punto pertenece al clúster cuyo centroide (media) es el más cercano. Es un algoritmo "no supervisado" porque no requiere etiquetas previas.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">¿Para qué se usa?</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Segmentación de Clientes:</strong> Agrupar clientes con comportamientos similares para estrategias de marketing.</li>
+                            <li><strong>Análisis de Patrones:</strong> Identificar grupos naturales en grandes conjuntos de datos.</li>
+                            <li><strong>Compresión de Imágenes:</strong> Reducir el número de colores en una imagen.</li>
+                            <li><strong>Detección de Anomalías:</strong> Identificar puntos de datos que no encajan bien en ningún clúster.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">Ejemplo de Código Python</h3>
+                        <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import numpy as np
+
+# Datos de ejemplo (con 3 clústeres subyacentes)
+X = np.array([
+    [1, 2], [1.5, 1.8], [0.8, 1.2], [0.5, 0.8], # Clúster 1
+    [5, 8], [8, 8], [6, 9], [7.5, 7],           # Clúster 2
+    [10, 2], [9.5, 1.5], [11, 2.5], [10.3, 1.8] # Clúster 3
+])
+
+# Estandarizar los datos
+scaler = StandardScaler()
+X_std = scaler.fit_transform(X)
+
+# Aplicar PCA para reducir a 2 componentes (si la dimensionalidad es mayor)
+pca = PCA(n_components=2)
+Z = pca.fit_transform(X_std)
+
+# Realizar un clustering K-Medias en función de las variables estandarizadas
+kmeans = KMeans(n_clusters=3, random_state=0, n_init=10)
+clases = kmeans.fit_predict(X_std)
+
+# Los centroides también se pueden obtener:
+centroids = kmeans.cluster_centers_
+
+print("Etiquetas de clústeres (primeros 5):\\n", clases[:5])
+print("Centroides de clústeres (en espacio estandarizado):\\n", centroids)
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4 flex flex-col justify-center items-center">
+                         <h3 class="text-xl font-bold text-[#005082] mb-2">Visualización: Clústeres Identificados</h3>
+                        <div class="chart-container w-full h-64">
+                            <canvas id="kmeansChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-400 mt-2">Los datos proyectados en los componentes principales, coloreados por clúster.</p>
+                    </div>
+                    <div class="lg:col-span-2 bg-[#1a202c] rounded-lg shadow-md p-4 mt-4">
+                        <h3 class="text-xl font-bold text-[#005082] mb-2">Interpretación del Clustering</h3>
+                        <p class="text-gray-400">Después de aplicar K-Means, cada punto de dato se asigna a un clúster. Al graficar los clústeres en función de las dos primeras componentes principales, podemos observar visualmente la separación de los grupos. Un buen clustering mostrará agrupaciones de puntos densas y bien separadas. La interpretación de estos clústeres depende del contexto de los datos; por ejemplo, diferentes grupos de clientes, tipos de plantas, o categorías de documentos.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        };
+
+        // --- StandardScaler Chart ---
+        const originalScalerData = [10, 20, 30, 5, 25];
+        const mean = originalScalerData.reduce((sum, val) => sum + val, 0) / originalScalerData.length;
+        const stdDev = Math.sqrt(originalScalerData.reduce((sum, val) => sum + (val - mean)**2, 0) / originalScalerData.length);
+        const scaledScalerData = originalScalerData.map(val => (val - mean) / stdDev);
+
+        new Chart(document.getElementById('standardScalerChart'), {
+            type: 'bar',
+            data: {
+                labels: originalScalerData.map((_, i) => `Dato ${i + 1}`),
+                datasets: [
+                    {
+                        label: 'Original',
+                        data: originalScalerData,
+                        backgroundColor: '#00A1E4',
+                        borderColor: '#00A1E4',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Estandarizado',
+                        data: scaledScalerData,
+                        backgroundColor: '#0077C0',
+                        borderColor: '#0077C0',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions,
+                scales: {
+                    x: {
+                        ...commonChartOptions.scales.x,
+                        type: 'category',
+                        title: { display: true, text: 'Datos' }
+                    },
+                    y: {
+                        ...commonChartOptions.scales.y,
+                        title: { display: true, text: 'Valor' }
+                    }
+                }
+            }
+        });
+
+        // --- PCA Chart ---
+        // Simulated 2D data that has some variance and correlation
+        const pcaOriginalX = [
+            [1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6],
+            [9, 11], [10, 8], [4, 5], [6, 9], [11, 12]
+        ];
+
+        // Manual standardization for PCA data (conceptual for visualization)
+        const pcaMeans = [pcaOriginalX.map(p => p[0]).reduce((s, v) => s + v, 0) / pcaOriginalX.length,
+                          pcaOriginalX.map(p => p[1]).reduce((s, v) => s + v, 0) / pcaOriginalX.length];
+        const pcaStdDevs = [Math.sqrt(pcaOriginalX.map(p => (p[0] - pcaMeans[0])**2).reduce((s, v) => s + v, 0) / pcaOriginalX.length),
+                            Math.sqrt(pcaOriginalX.map(p => (p[1] - pcaMeans[1])**2).reduce((s, v) => s + v, 0) / pcaOriginalX.length)];
+        
+        const pcaX_std = pcaOriginalX.map(p => [
+            (p[0] - pcaMeans[0]) / pcaStdDevs[0],
+            (p[1] - pcaMeans[1]) / pcaStdDevs[1]
+        ]);
+
+        // Simplified PCA transformation (conceptual for visualization). 
+        // In reality, this involves covariance matrix, eigenvalues/vectors.
+        // Here, we just simulate a rotation and scaling to show reduction.
+        const pcaZ = pcaX_std.map(p => ({
+            x: p[0] * 0.707 + p[1] * 0.707, // Simulate first component (rotated)
+            y: p[1] * 0.707 - p[0] * 0.707  // Simulate second component (rotated)
+        }));
+
+        new Chart(document.getElementById('pcaChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Datos Estandarizados',
+                        data: pcaX_std.map(p => ({x: p[0], y: p[1]})),
+                        backgroundColor: '#00A1E4',
+                        pointRadius: 6,
+                        borderColor: '#00A1E4'
+                    },
+                    {
+                        label: 'Componentes Principales',
+                        data: pcaZ,
+                        backgroundColor: '#0077C0',
+                        pointRadius: 6,
+                        borderColor: '#0077C0',
+                    }
+                ]
+            },
+            options: {
+                ...commonChartOptions,
+                scales: {
+                    x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Característica / Componente 1' } },
+                    y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Característica / Componente 2' } }
+                }
+            }
+        });
+
+        // --- KMeans Chart ---
+        // Simulated original data with 3 distinct clusters
+        const kmeansOriginalX = [
+            [1, 2], [1.5, 1.8], [0.8, 1.2], [0.5, 0.8], // Cluster 1
+            [5, 8], [8, 8], [6, 9], [7.5, 7],           // Cluster 2
+            [10, 2], [9.5, 1.5], [11, 2.5], [10.3, 1.8] // Cluster 3
+        ];
+
+        // Standardize KMeans data (similar to how pcaX_std was derived)
+        const kmeansMeans = [kmeansOriginalX.map(p => p[0]).reduce((s, v) => s + v, 0) / kmeansOriginalX.length,
+                             kmeansOriginalX.map(p => p[1]).reduce((s, v) => s + v, 0) / kmeansOriginalX.length];
+        const kmeansStdDevs = [Math.sqrt(kmeansOriginalX.map(p => (p[0] - kmeansMeans[0])**2).reduce((s, v) => s + v, 0) / kmeansOriginalX.length),
+                               Math.sqrt(kmeansOriginalX.map(p => (p[1] - kmeansMeans[1])**2).reduce((s, v) => s + v, 0) / kmeansOriginalX.length)];
+        
+        const kmeansX_std = kmeansOriginalX.map(p => [
+            (p[0] - kmeansMeans[0]) / kmeansStdDevs[0],
+            (p[1] - kmeansMeans[1]) / kmeansStdDevs[1]
+        ]);
+
+        // Simulate PCA on standardized KMeans data to get Z for plotting
+        const kmeansZ = kmeansX_std.map(p => ({
+            x: p[0] * 0.707 + p[1] * 0.707, // Simular Componente Principal 1
+            y: p[1] * 0.707 - p[0] * 0.707  // Simular Componente Principal 2
+        }));
+
+        // Simulate KMeans clustering on kmeansX_std (or kmeansZ for visualization)
+        // This is a manual assignment for demonstration based on the visually separated clusters.
+        // In a real scenario, you'd run a KMeans algorithm in JS or use results from Python.
+        const kmeansLabels = [
+            0, 0, 0, 0, // Cluster 1
+            1, 1, 1, 1, // Cluster 2
+            2, 2, 2, 2  // Cluster 3
+        ];
+
+        const kmeansClusterColors = ['#00A1E4', '#0077C0', '#005082']; // Blue palette for clusters
+
+        const kmeansDatasets = [];
+        for (let i = 0; i < 3; i++) { // For 3 clusters
+            kmeansDatasets.push({
+                label: `Clúster ${i + 1}`,
+                data: kmeansZ.filter((_, idx) => kmeansLabels[idx] === i),
+                backgroundColor: kmeansClusterColors[i],
+                pointRadius: 6,
+                borderColor: kmeansClusterColors[i]
+            });
+        }
+
+        // Simulate centroids in the Z-space. These would be actual centroids from KMeans.cluster_centers_
+        const kmeansCentroids = [
+            {x: -1.2, y: 0.1}, // Centroid for cluster 0 in Z space
+            {x: 6.5, y: -0.5}, // Centroid for cluster 1 in Z space
+            {x: 2.0, y: -7.0}  // Centroid for cluster 2 in Z space
+        ];
+
+        kmeansDatasets.push({
+            label: 'Centroides',
+            data: kmeansCentroids,
+            backgroundColor: '#FFD700', // Gold color for centroids
+            pointRadius: 10,
+            pointStyle: 'star',
+            borderColor: '#FFD700',
+            borderWidth: 2
+        });
+
+        new Chart(document.getElementById('kmeansChart'), {
+            type: 'scatter',
+            data: {
+                datasets: kmeansDatasets
+            },
+            options: {
+                ...commonChartOptions,
+                scales: {
+                    x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Componente Principal 1' } },
+                    y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Componente Principal 2' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
