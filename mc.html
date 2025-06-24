@@ -108,19 +108,25 @@ print(f"ECM (Generalizado): {ecm2:.2f}")
                     <div class="bg-[#1a202c] rounded-lg shadow-md p-4 lg:col-span-2">
                         <h3 class="text-xl font-bold text-[#005082] mb-2">3. Mínimos Cuadrados Generalizado Ponderado</h3>
                         <p class="text-gray-400 mb-4">
-                            En el método ponderado, se asignan pesos (`w`) a cada observación, generalmente inversamente proporcionales a la varianza del error de esa observación. Esto es útil cuando algunas mediciones son más fiables que otras.
-                            La matriz `W` es una matriz diagonal con los pesos. Los errores grandes reciben menos peso, y los pequeños, más.
+                            En el método ponderado, se asignan pesos (`w`) a cada observación para influir en su importancia durante el ajuste. Esto es útil cuando la precisión de las mediciones varía. La matriz `W` es una matriz diagonal con estos pesos.
                         </p>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li>`w = IA` (Matriz Identidad): Todos los datos tienen el mismo peso. `W = np.eye(len(x))`</li>
+                            <li>`w = 1 / y`: Pondera más a los valores de `y` más bajos. `W = np.diag(1 / y)`</li>
+                            <li>`w = t²` (o `x²`): Pondera más a los valores de `t` (o `x`) más altos. `W = np.diag(t**2)`</li>
+                            <li>`w = 1 / σ²`: Pondera más a los datos con menor error o mayor precisión medida. `W = np.diag(1 / sigma**2)` (requiere conocimiento de la varianza del error `sigma` para cada punto)</li>
+                        </ul>
                         <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
 <pre><code>
 # --- Generalizado ponderado ---
-w = 1 / N # Ejemplo de pesos: inversamente proporcional a N
+# Ejemplo de pesos: proporcional al cuadrado de N (dando más peso a datos mayores)
+w = N ** 2 
 W = np.diag(w) # Matriz de pesos diagonal
 At_W = A.T @ W
 coef_pond = np.linalg.inv(At_W @ A) @ (At_W @ ln_N)
 f3 = lambda t: np.exp(coef_pond[0] * t + coef_pond[1])
 ecm3 = ecm(t, N, f3) # Utilizando la función ecm
-print(f"ECM (Generalizado ponderado): {ecm3:.2f}")
+print(f"ECM (Generalizado ponderado con w = N**2): {ecm3:.2f}")
 </code></pre>
                         </div>
                     </div>
@@ -281,11 +287,11 @@ def ecm(x, y, f):
         const ecm2 = ecm(t_data, N_data, f2); // Calculate ECM using the new function
 
         // --- 3. Generalizado ponderado ---
-        // w = 1 / N
+        // w = N ** 2 (Example: giving more weight to larger N values)
         // W = np.diag(w)
         // At_W = A.T @ W
         // coef_pond = np.linalg.inv(At_W @ A) @ (At_W @ ln_N)
-        const w_data = N_data.map(val => 1 / val);
+        const w_data = N_data.map(val => val * val); // Changed to N ** 2 as per user's request
         const W_matrix = numeric.diag(w_data); // Create diagonal matrix from weights
 
         const At_W_pond = numeric.dot(A_T_matrix, W_matrix);
