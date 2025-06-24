@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Las lloraditas de Abru</title>
+    <!-- Importa la fuente Montserrat de Google Fonts para un diseño moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de variables CSS para el tema oscuro */
+        :root {
+            --bg-primary: #1a202c; /* Fondo principal muy oscuro */
+            --bg-secondary: #2d3748; /* Fondo de tarjetas/elementos secundarios */
+            --text-primary: #e2e8f0; /* Color de texto principal (gris claro) */
+            --text-secondary: #cbd5e0; /* Color de texto secundario (gris un poco más oscuro) */
+            --accent-color: #4299e1; /* Color de acento (azul vibrante) */
+            --accent-hover: #63b3ed; /* Color de acento al pasar el ratón */
+            --border-color: #4a5568; /* Color de borde para las tarjetas */
+            --shadow-light: rgba(0, 0, 0, 0.3); /* Sombra ligera */
+            --shadow-medium: rgba(0, 0, 0, 0.5); /* Sombra media */
+        }
+
+        /* Estilos globales para el cuerpo de la página */
+        body {
+            font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
+            background-color: var(--bg-primary); /* Fondo oscuro */
+            color: var(--text-primary); /* Color de texto claro */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra el contenido horizontalmente */
+            min-height: 100vh; /* Ocupa al menos el 100% de la altura de la vista */
+            line-height: 1.6; /* Altura de línea para mejor legibilidad */
+            overflow-x: hidden; /* Evita el scroll horizontal */
+        }
+
+        /* Contenedor principal para limitar el ancho del contenido */
+        .container {
+            width: 90%;
+            max-width: 1000px; /* Ancho máximo para el contenido */
+            margin: 40px auto;
+            text-align: center;
+            padding: 0 15px; /* Padding horizontal para pantallas pequeñas */
+        }
+
+        /* Estilos para el encabezado */
+        header {
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 3em; /* Tamaño grande para el título */
+            margin-bottom: 15px;
+            font-weight: 700; /* Negrita */
+            letter-spacing: 1px; /* Espaciado entre letras */
+            color: rgb(0 161 228 / var(--tw-text-opacity, 1));
+        }
+
+        header p {
+            font-size: 1.15em;
+            color: var(--text-secondary); /* Color secundario para el párrafo */
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Estilos para la rejilla de tarjetas */
+        .links-grid {
+            display: grid;
+            /* Columnas responsivas: mínimo 280px, se auto-ajustan */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px; /* Espacio entre las tarjetas */
+            padding: 20px 0;
+        }
+
+        /* Estilos para cada tarjeta individual */
+        .card {
+            background-color: var(--bg-secondary); /* Fondo oscuro para la tarjeta */
+            border-radius: 15px; /* Esquinas más redondeadas */
+            padding: 30px;
+            box-shadow: 0 10px 25px var(--shadow-medium); /* Sombra más pronunciada */
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: left;
+            border: 1px solid var(--border-color); /* Borde sutil */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px; /* Altura mínima para uniformidad */
+        }
+
+        .card:hover {
+            transform: translateY(-10px); /* Efecto de "levantar" al pasar el ratón */
+            background-color: #3b455b; /* Ligeramente más claro al pasar el ratón */
+            box-shadow: 0 15px 35px var(--shadow-medium); /* Sombra expandida al pasar el ratón */
+        }
+
+        .card h2 {
+            font-size: 1.8em;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            flex-grow: 1; /* Permite que el párrafo ocupe el espacio disponible */
+        }
+
+        /* Estilos para los botones dentro de las tarjetas */
+        .card a {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--bg-primary); /* Texto oscuro para contraste en el botón */
+            padding: 14px 25px;
+            border-radius: 10px; /* Bordes más redondeados para los botones */
+            text-decoration: none;
+            font-weight: 700; /* Texto del botón en negrita */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--shadow-light); /* Sombra para el botón */
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .card a:hover {
+            background-color: var(--accent-hover); /* Color de acento más claro al pasar el ratón */
+            transform: translateY(-3px); /* Efecto de "levantar" el botón */
+            box-shadow: 0 8px 20px var(--shadow-medium); /* Sombra expandida para el botón */
+        }
+
+        /* Estilos para el pie de página */
+        footer {
+            margin-top: 60px;
+            padding: 25px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color); /* Borde superior para el pie de página */
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Media Queries para responsividad */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5em;
+            }
+            header p {
+                font-size: 1.05em;
+            }
+            .card {
+                padding: 25px;
+                min-height: auto; /* Permite que la altura se ajuste automáticamente en móviles */
+            }
+            .card h2 {
+                font-size: 1.6em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2em;
+            }
+            header p {
+                font-size: 0.95em;
+            }
+            .links-grid {
+                grid-template-columns: 1fr; /* Una columna en pantallas muy pequeñas */
+                gap: 20px;
+            }
+            .card {
+                padding: 20px;
+            }
+            .card h2 {
+                font-size: 1.4em;
+            }
+            .card a {
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mate 2</h1>
+            <p>Si con esto no aprobas, me mato.</p>
+        </header>
+
+        <section class="links-grid">
+            <!-- Tarjeta de Ejemplo 1: Portafolio -->
+            <div class="card">
+                <h2>R2</h2>
+                <p>Coeficiente R Cuadrado</p>
+                <a href="/R2.html" target="_self" rel="noopener noreferrer">Explorar Proyectos</a>
+            </div>
+
+            <!-- Añade más tarjetas aquí si lo necesitas, siguiendo el mismo formato -->
+
+        </section>
+    </div>
+
+    <footer>
+        <p>Lloradita Abru</p>
+    </footer>
+</body>
+</html>
