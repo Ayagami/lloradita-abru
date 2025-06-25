@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proporciones de Varianza Explicada en PCA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!--
+    Objective: This document explains the explained variance ratio in PCA, its interpretation, and provides a Python code example and an interactive visualization.
+    Color Palette: Brilliant Blues (Dark Mode Adjusted: #1a202c, #2d3748, #e2e8f0, #00A1E4, #0077C0, #005082)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 500px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#1a202c] text-[#e2e8f0]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A1E4] mb-2">Proporciones de Varianza Explicada en PCA</h1>
+            <p class="text-lg md:text-xl text-[#0077C0] max-w-3xl mx-auto">Cuánta información captura cada componente principal.</p>
+        </header>
+
+        <main class="grid grid-cols-1 gap-8">
+
+            <!-- Sección: ¿Qué son las Proporciones de Varianza Explicada? -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">¿Qué son las Proporciones de Varianza Explicada?</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">
+                    En el Análisis de Componentes Principales (PCA), la "proporción de varianza explicada" (conocida como `explained_variance_ratio_` en Scikit-learn) es una métrica que indica la cantidad de variabilidad (o "información") que cada componente principal individual captura del conjunto de datos original. Se expresa como una proporción (un valor entre 0 y 1) o como un porcentaje.
+                </p>
+                <p class="text-gray-400 mb-4">
+                    Cada componente principal es una nueva variable construida como una combinación lineal de las variables originales, y se orienta en la dirección de máxima varianza de los datos. La proporción de varianza explicada nos dice qué tan importante es esa dirección para representar la dispersión total de los datos.
+                </p>
+            </div>
+
+            <!-- Sección: ¿Para qué se usan y Cómo se interpretan? -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#0077C0] mb-4">¿Para qué se usan y Cómo se interpretan?</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Propósito y Uso</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Reducción de Dimensionalidad:</strong> Ayuda a decidir cuántos componentes principales conservar. Se buscan suficientes componentes para explicar una gran parte de la varianza total (ej., 80-95%).</li>
+                            <li><strong>Comprensión de Datos:</strong> Permite entender qué tan "redundantes" son las variables originales o si la variabilidad de los datos se concentra en unas pocas dimensiones.</li>
+                            <li><strong>Criterio de Selección:</strong> Es fundamental para seleccionar el número óptimo de componentes principales (<code>n_components</code>) en PCA, basándose en la cantidad de información que deseamos retener.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#1a202c] rounded-lg shadow-md p-4">
+                        <h3 class="text-xl font-bold text-[#0077C0] mb-2">Interpretación de los Valores</h3>
+                        <ul class="list-disc list-inside text-gray-400 mb-4 space-y-2">
+                            <li><strong>Componente Individual:</strong> Cada valor en `explained_variance_ratio_` corresponde a la proporción de varianza explicada por cada componente principal, ordenado de mayor a menor. Por ejemplo, `var_exp[0]` es para la primera componente principal, `var_exp[1]` para la segunda, y así sucesivamente.</li>
+                            <li><strong>Suma Total:</strong> La suma de todas las proporciones de varianza explicada siempre será 1 (o 100%), ya que representan la varianza total del conjunto de datos.</li>
+                            <li><strong>Importancia Relativa:</strong> Si la Componente 1 explica, por ejemplo, el 90% de la variabilidad, significa que esta única dimensión captura casi toda la información importante de los datos. Las componentes subsiguientes que expliquen porcentajes muy bajos (ej., 1% o menos) pueden considerarse "despreciables" o ruido, y podrían descartarse sin una pérdida significativa de información.</li>
+                        </ul>
+                        <p class="text-center text-sm text-gray-300 mt-4">
+                            <strong>Regla Nemotécnica:</strong> "Si la primera componente explica casi todo, ¡las demás son solo para rellenar el espacio!"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Ejemplo de Código Python -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Ejemplo de Código Python</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">Usemos un ejemplo con datos simulados para ilustrar cómo obtener y analizar las proporciones de varianza explicada.</p>
+                <div class="bg-[#232323] text-white rounded-lg p-4 font-mono text-sm overflow-x-auto">
+<pre><code>
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Datos de ejemplo (50 observaciones, 4 características)
+# Simular datos donde las primeras características explican más varianza
+np.random.seed(42)
+X = np.random.rand(50, 4) * 10
+X[:, 0] = X[:, 0] * 5 + np.random.normal(0, 1, 50) # Aumentar varianza en la primera característica
+X[:, 1] = X[:, 1] * 2 + np.random.normal(0, 0.5, 50) # Aumentar varianza en la segunda
+
+# Estandarizar los datos (paso crucial para PCA)
+scaler = StandardScaler()
+X_norm = scaler.fit_transform(X)
+
+# Realizar PCA, pidiendo hasta 4 componentes (o menos si los datos son de menor dimensión)
+pca = PCA(n_components=4) # Puedes poner 'None' para obtener todas las componentes
+X_pca = pca.fit_transform(X_norm)
+
+# Proporciones de varianza explicada
+var_exp = pca.explained_variance_ratio_
+
+print(f"Proporción de la variabilidad explicada por cada componente:")
+for i, var in enumerate(var_exp):
+    print(f"Componente {i+1}: {var:.4f} ({var*100:.2f}%)")
+
+print(f"\nSuma total de la variabilidad explicada: {sum(var_exp):.4f} ({sum(var_exp)*100:.2f}%)")
+
+# Interpretación: Si la Componente 1 explica el 90%, significa que 
+# esa componente ya captura la gran mayoría de la información de los datos, 
+# y las componentes siguientes (ej. Componente 2 con 5%) son menos relevantes,
+# y quizás las restantes sean despreciables (ruido).
+</code></pre>
+                </div>
+            </div>
+
+            <!-- Sección: Visualización Interactiva -->
+            <div class="bg-[#2d3748] rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-center text-[#00A1E4] mb-4">Visualización de las Proporciones Explicadas</h2>
+                <p class="text-center text-[#e2e8f0] mb-6">El gráfico de barras muestra la varianza explicada por cada componente, mientras que la línea muestra la suma acumulada.</p>
+                <div class="chart-container w-full h-96">
+                    <canvas id="explainedVarianceChart"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-400 mt-2">Un "codo" pronunciado en la curva acumulada sugiere el número óptimo de componentes.</p>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">Lloradita de Abru</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            return item.dataset.label;
+                        },
+                        label: function(tooltipItem) {
+                            const value = tooltipItem.raw;
+                            return `${tooltipItem.label}: ${(value * 100).toFixed(2)}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'category', // For bar chart categories
+                    title: {
+                        display: true,
+                        text: 'Componente Principal',
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    beginAtZero: true,
+                    max: 1.0, // Max for proportion
+                    title: {
+                        display: true,
+                        text: 'Proporción de Varianza Explicada',
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0',
+                        callback: function(value) {
+                            return (value * 100).toFixed(0) + '%';
+                        }
+                    }
+                },
+                y1: { // Secondary Y axis for cumulative sum
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    max: 1.0,
+                    grid: {
+                        drawOnChartArea: false // Only draw grid for primary Y axis
+                    },
+                    ticks: {
+                        color: '#e2e8f0',
+                        callback: function(value) {
+                            return (value * 100).toFixed(0) + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Varianza Acumulada',
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        };
+
+        // --- Simulated Explained Variance Data ---
+        // These values should reflect typical PCA output, where first components explain more.
+        const explainedVarianceRatios = [0.75, 0.15, 0.07, 0.03]; // Sums to 1.0
+        const cumulativeExplainedVariance = [];
+        let sum = 0;
+        for (let i = 0; i < explainedVarianceRatios.length; i++) {
+            sum += explainedVarianceRatios[i];
+            cumulativeExplainedVariance.push(sum);
+        }
+
+        const labels = explainedVarianceRatios.map((_, i) => `PC ${i + 1}`);
+
+        new Chart(document.getElementById('explainedVarianceChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Varianza Explicada por Componente',
+                        data: explainedVarianceRatios,
+                        backgroundColor: '#00A1E4', // Bar color
+                        borderColor: '#00A1E4',
+                        borderWidth: 1,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Varianza Acumulada',
+                        data: cumulativeExplainedVariance,
+                        type: 'line',
+                        borderColor: '#0077C0', // Line color
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#0077C0',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: commonChartOptions
+        });
+    </script>
+</body>
+</html>
